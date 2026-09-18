@@ -1,107 +1,106 @@
 # CSRF Online — PoC Builder
 
-Generator **Cross-Site Request Forgery (CSRF)** Proof-of-Concept dalam satu file `index.php`.
-Dibangun ulang dengan UI *modern dark glassmorphism* oleh **0xfndlabs**.
+Cross-Site Request Forgery (CSRF) Proof-of-Concept generator in a single `index.php` file.
+Rebuilt with a modern dark glassmorphism UI by **0xfndlabs**.
 
-> ⚠️ **Hanya untuk pengujian keamanan berizin.** Gunakan pada target yang kamu miliki atau
-> punya otorisasi tertulis. Penyalahgunaan di luar konteks tersebut adalah ilegal dan tanggung
-> jawab pengguna.
+> ⚠️ **For authorized security testing only.** Use it on targets you own or have written
+> authorization to test. Misuse outside that context is illegal and the user's responsibility.
 
 ---
 
-## Fitur
+## Features
 
-- **Request Builder dinamis** — tambah/hapus baris *fields*, *file fields*, dan *custom headers* tanpa batas.
+- **Dynamic Request Builder** — add/remove *fields*, *file fields*, and *custom headers* rows without limit.
 - **Method**: `POST`, `GET`, `PUT`, `PATCH`, `DELETE`.
 - **Content-Type**: `multipart/form-data`, `application/x-www-form-urlencoded`, `application/json`.
-- **Dua mode PoC** (otomatis dipilih):
-  - **Form klasik** — HTML `form` murni (bisa auto-submit on load), paling reliable untuk CSRF lintas-origin karena tidak dibatasi CORS.
-  - **Fetch/FormData** — dipakai otomatis jika ada header custom, Content-Type `JSON`, atau method `PUT/PATCH/DELETE`; mengirim cookie via `credentials: include`.
-- **Opsional**:
-  - *Auto-submit on load* (tanpa file)
-  - *Auto-submit saat file dipilih* (onchange)
-  - Target buka: tab baru / tab sama (form klasik)
-- **Hasil**: PoC otomatis dibuka di tab baru (via AJAX, tanpa reload), plus tombol **Download .html**, **Copy HTML**, dan **HTML Source**.
-- **Keamanan input**: semua output di-`htmlspecialchars`, URL divalidasi hanya `http/https`, method/enctype/target di-whitelist (bebas XSS & open redirect).
+- **Two PoC modes** (auto-selected):
+  - **Classic form** — plain HTML `form` (auto-submit capable), most reliable for cross-origin CSRF because it is not restricted by CORS.
+  - **Fetch/FormData** — used automatically when custom headers exist, Content-Type is `JSON`, or the method is `PUT/PATCH/DELETE`; sends cookies via `credentials: include`.
+- **Options**:
+  - *Auto-submit on load* (no file)
+  - *Auto-submit when file is selected* (onchange)
+  - Open in: new tab / same tab (classic form)
+- **Result**: PoC opens in a new tab automatically (via AJAX, no reload), plus **Download .html**, **Copy HTML**, and **HTML Source** buttons.
+- **Input security**: all output is `htmlspecialchars`-escaped, URL validated as `http/https` only, method/enctype/target whitelisted (free of XSS & open redirect).
 
 ---
 
-## Cara Menjalankan
+## Running
 
-Persyaratan: **PHP ≥ 7** (dengan ekstensi `filter` & `json` — keduanya bawaan).
+Requirements: **PHP ≥ 7** (with built-in `filter` & `json` extensions).
 
 ```bash
-# via server bawaan PHP
+# via PHP built-in server
 php -S 0.0.0.0:8080
 
-# lalu buka
+# then open
 # http://localhost:8080
 ```
 
-Atau taruh `index.php` di hosting/`web root` PHP apa pun.
+Or drop `index.php` into any PHP hosting / web root.
 
 ---
 
-## Cara Pakai
+## Usage
 
-1. Isi **URL Target** (harus `http(s)://`).
-2. Pilih **Method** dan **Content-Type**.
-3. Tambahkan **Fields** — parameter body/query (name + value).
-4. Tambahkan **Upload Fields** — nama field file sesuai target (mis. `file`, `Filedata`, `file[]`).
-5. Opsional: **Custom Headers**, dan hidupkan/matikan perilaku **auto-submit**.
-6. Klik **Generate PoC**.
+1. Fill in **URL Target** (must be `http(s)://`).
+2. Pick the **Method** and **Content-Type**.
+3. Add **Fields** — body/query parameters (name + value).
+4. Add **Upload Fields** — file field names matching the target (e.g. `file`, `Filedata`, `file[]`).
+5. Optionally set **Custom Headers**, and toggle **auto-submit** behavior.
+6. Click **Generate PoC**.
 
-### Alur hasil
+### Result flow
 
 ```
-Generate PoC ──▶ (AJAX, tanpa reload) ──▶ tab baru berisi PoC
-                      │
-                      └─ auto-submit ON? ──▶ konfirmasi dulu sebelum tab dijalankan
+Generate PoC ──▶ (AJAX, no reload) ──▶ new tab with the PoC
+                    │
+                    └─ auto-submit ON? ──▶ confirm first before the tab fires
 ```
 
-Jika popup browser diblokir, gunakan tombol **"Buka di tab baru"** di kartu hasil
-(klik nyata = diizinkan oleh browser), atau **Download .html** untuk disimpan.
+If the browser blocks the popup, use the **"Open in new tab"** button in the result card
+(a real click is allowed by the browser), or **Download .html** to save it.
 
 ---
 
-## Contoh Request
+## Request Examples
 
-| Skenario                    | Method | Content-Type | Fields            | Upload Fields |
+| Scenario                    | Method | Content-Type | Fields            | Upload Fields |
 |-----------------------------|--------|--------------|-------------------|---------------|
-| Upload file + token         | POST   | multipart    | `token=abc123`    | `file`        |
+| File upload + token         | POST   | multipart    | `token=abc123`    | `file`        |
 | Login form                  | POST   | urlencoded   | `user`, `pass`    | –             |
-| Fetch-like XHR (token dll)  | POST   | json         | `{"name":"x"}`    | –             |
+| Fetch-like XHR (token etc.) | POST   | json         | `{"name":"x"}`    | –             |
 | Query API                   | GET    | urlencoded   | `q=foo`           | –             |
 | REST + custom header        | PUT    | json         | `data`            | –             |
 
 ---
 
-## Detail Implementasi
+## Implementation Notes
 
-| Bagian              | Keterangan |
-|---------------------|------------|
-| `valid_url()`       | Validasi skema `http/https`; menolak `javascript:`, dll. |
-| `po_classic()`      | Generator PoC form klasik. |
-| `po_fetch()`        | Generator PoC fetch/FormData. |
-| `poc_style()`       | Tema glassmorphism untuk halaman PoC hasil generate. |
-| AJAX `ajax=1`       | Server membalas `JSON {ok, poc, method, enctype, auto, autoChange}`. |
-| Sanitasi            | `htmlspecialchars(..., ENT_QUOTES)` pada semua echo user input. |
+| Part                | Description |
+|---------------------|-------------|
+| `valid_url()`       | Validates `http/https` scheme; rejects `javascript:` etc. |
+| `po_classic()`      | Classic form PoC generator. |
+| `po_fetch()`        | Fetch/FormData PoC generator. |
+| `poc_style()`       | Glassmorphism theme for generated PoC pages. |
+| AJAX `ajax=1`       | Server responds with `JSON {ok, poc, method, enctype, auto, autoChange}`. |
+| Sanitization        | `htmlspecialchars(..., ENT_QUOTES)` on every echoed user input. |
 
-### Batasan & perilaku browser (bukan bug)
+### Browser limitations (not bugs)
 
-- **Origin/Referer tidak bisa diset** — *forbidden header* pada browser.
-- **Fetch lintas-origin** butuh CORS; mode form klasik tidak.
-- **File tidak bisa diisi otomatis** — pemilih file wajib pilih file (kebijakan keamanan browser); gunakan *auto-submit saat file dipilih*.
-- Kecocokan nama field file harus pas dengan nama parameter target `$_FILES` (mis. PHP `$_FILES['file']` ⇄ field `file`).
+- **Origin/Referer cannot be set** — those are *forbidden headers* in browsers.
+- **Cross-origin fetch requires CORS**; classic form mode does not.
+- **File inputs cannot be pre-filled** — users must select the file (browser security policy); use *auto-submit when file is selected*.
+- File field names must match the target parameter (e.g. PHP `$_FILES['file']` ⇄ field `file`).
 
 ---
 
-## Teknologi
+## Tech Stack
 
-- PHP (tanpa dependensi/Composer) — logika & generator PoC.
-- CSS murni (tanpa Bootstrap/jQuery) — glassmorphism, responsive.
-- JS vanilla — builder dinamis & AJAX generate.
+- PHP (no dependencies/Composer) — logic & PoC generation.
+- Pure CSS (no Bootstrap/jQuery) — glassmorphism, responsive.
+- Vanilla JS — dynamic builder & AJAX generation.
 
-## Kredit
+## Credits
 
-Dikembangkan oleh **0xfndlabs**.
+Developed by **0xfndlabs**.

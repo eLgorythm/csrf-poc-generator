@@ -156,9 +156,9 @@ $built  = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	if ($action === '') {
-		$errors[] = 'URL Target wajib diisi.';
+		$errors[] = 'URL Target is required.';
 	} elseif (!valid_url($action)) {
-		$errors[] = 'URL Target tidak valid (hanya http/https).';
+		$errors[] = 'Invalid URL Target (only http/https allowed).';
 	}
 	if (empty($errors)) {
 		$useFetch = count($headers) > 0 || $enctype === 'json' || in_array($method, array('PUT', 'PATCH', 'DELETE'), true);
@@ -187,10 +187,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="CSRF PoC generator online — build Proof-of-Concept for Cross-Site Request Forgery: classic form or fetch, auto-submit, download & open directly in a new tab. For authorized security testing.">
+	<meta name="robots" content="index,follow">
+	<link rel="canonical" href="https://0xfndlabs.my.id/tools/csrf/index.php">
 	<title>CSRF Online — PoC Builder by 0xfndlabs</title>
 	<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2322d3ee' stroke-width='2'%3E%3Cpath d='M12 2l8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5z'/%3E%3Cpath d='M9 12l2 2 4-4'/%3E%3C/svg%3E">
 	<style>
@@ -415,7 +418,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 						</div>
 					</div>
 					<div class="hint">
-						Gunakan <code>Multipart</code> untuk upload file. GET / JSON / header custom / PUT/PATCH/DELETE otomatis memakai mode fetch (JS).
+						Use <code>Multipart</code> for file upload. GET / JSON / custom headers / PUT/PATCH/DELETE automatically use fetch mode (JS).
 					</div>
 				</section>
 
@@ -426,7 +429,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 						<button type="button" class="add" onclick="addRow('frows')"><span>+ Add</span></button>
 					</h2>
 					<div>
-						<label class="label">Parameter body / query (name &amp; value)</label>
+						<label class="label">Body / query parameters (name &amp; value)</label>
 						<div id="frows">
 							<?php foreach ($fields as $f): ?>
 								<div class="row-it f2">
@@ -446,11 +449,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 						<button type="button" class="add" onclick="addRow('filerows')"><span>+ Add</span></button>
 					</h2>
 					<div>
-						<label class="label">Nama field file sesuai target</label>
+						<label class="label">File field name matching the target</label>
 						<div id="filerows">
 							<?php foreach ($files as $n): ?>
 								<div class="row-it f1">
-									<input class="field mon" name="files[]" placeholder="mis. file / Filedata / file[]" value="<?php echo h($n); ?>">
+									<input class="field mon" name="files[]" placeholder="e.g. file / Filedata / file[]" value="<?php echo h($n); ?>">
 									<button type="button" class="rm" title="Hapus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
 								</div>
 							<?php endforeach; ?>
@@ -478,12 +481,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				<section class="glass g5 full">
 					<h2>
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09c.64 0 1.17-.43 1.32-1.04V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09c0 .64.43 1.17 1.04 1.32H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-						Perilaku
+						Behavior
 					</h2>
 					<div class="opt">
 						<div>
 							<div class="t">Auto-submit on load</div>
-							<div class="d">PoC langsung jalan tanpa klik — hanya jika tanpa file.</div>
+							<div class="d">PoC runs automatically without any click — only when no file is involved.</div>
 						</div>
 						<label class="switch">
 							<input type="checkbox" name="auto" <?php echo $auto ? 'checked' : ''; ?>>
@@ -492,8 +495,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 					</div>
 					<div class="opt">
 						<div>
-							<div class="t">Auto-submit saat file dipilih</div>
-							<div class="d">Request terkirim begitu file dipilih (onchange).</div>
+							<div class="t">Auto-submit when file is selected</div>
+							<div class="d">Request fires as soon as the file is picked (onchange).</div>
 						</div>
 						<label class="switch">
 							<input type="checkbox" name="autochange" <?php echo $autoChange ? 'checked' : ''; ?>>
@@ -502,12 +505,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 					</div>
 					<div class="opt">
 						<div>
-							<div class="t">Buka di target</div>
-							<div class="d">Tab baru atau tab yang sama untuk form klasik.</div>
+							<div class="t">Open in</div>
+							<div class="d">New tab or same tab for the classic form.</div>
 						</div>
 						<div class="seg">
-							<label><input type="radio" name="target" value="_blank" <?php echo $target === '_blank' ? 'checked' : ''; ?>><span>Tab baru</span></label>
-							<label><input type="radio" name="target" value="_self" <?php echo $target === '_self' ? 'checked' : ''; ?>><span>Tab sama</span></label>
+							<label><input type="radio" name="target" value="_blank" <?php echo $target === '_blank' ? 'checked' : ''; ?>><span>New tab</span></label>
+							<label><input type="radio" name="target" value="_self" <?php echo $target === '_self' ? 'checked' : ''; ?>><span>Same tab</span></label>
 						</div>
 					</div>
 					<button type="submit" class="generate">
@@ -536,7 +539,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				<div class="acts">
 					<button type="button" class="btn btn-primary" onclick="openPoc()">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-						Buka di tab baru
+						Open in new tab
 					</button>
 					<button type="button" class="btn btn-ghost" onclick="downloadPoC()">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -550,8 +553,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				</div>
 
 				<div class="curl-warn">
-					PoC otomatis dibuka di tab baru setelah generate. Bila auto-submit aktif, kamu akan diminta konfirmasi dulu — PoC akan langsung mengirim request ke target begitu halaman terbuka.
-					Header Origin/Referer tidak bisa di-set browser (forbidden header) — untuk CSRF lintas-origin paling reliable gunakan mode form klasik.
+					The PoC opens in a new tab automatically after generation. If auto-submit is enabled you will be asked to confirm first — the PoC will send the request to the target as soon as the page loads.
+					Origin/Referer headers cannot be set by the browser (forbidden headers) — for the most reliable cross-origin CSRF use classic form mode.
 				</div>
 
 				<details class="srcwrap">
@@ -602,7 +605,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		}
 		function pocBlobUrl() {
 			var poc = currentPoc || (document.getElementById('soc') || {}).value || '';
-			if (!poc) { showErrors(['Belum ada PoC untuk dibuka.']); return null; }
+			if (!poc) { showErrors(['No PoC generated yet.']); return null; }
 			return URL.createObjectURL(new Blob([poc], { type: 'text/html' }));
 		}
 		function openPoc() {
@@ -610,7 +613,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			if (!url) return false;
 			var w = window.open(url, '_blank');
 			setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
-			if (!w) showErrors(['Popup diblokir browser. Izinkan popup, atau klik tombol lagi.']);
+			if (!w) showErrors(['Browser blocked the popup. Allow popups, or click the button again.']);
 			return !!w;
 		}
 		function writePoc(win, poc) {
@@ -629,7 +632,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				     + '<input class="field" name="fvalue[]" placeholder="Value">' + rm;
 			}
 			if (kind === 'filerows') {
-				return '<input class="field mon" name="files[]" placeholder="mis. file / Filedata / file[]">' + rm;
+				return '<input class="field mon" name="files[]" placeholder="e.g. file / Filedata / file[]">' + rm;
 			}
 			return '<input class="field mon" name="hname[]" placeholder="Header name">'
 			     + '<input class="field mon" name="hvalue[]" placeholder="Header value">' + rm;
@@ -680,7 +683,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 						setPoc(d.poc);
 						var fire = d.auto || d.autoChange;
 						if (fire) {
-							if (window.confirm('PoC akan langsung mengirim request ke target saat tab dibuka.\nTetap buka di tab baru?')) {
+							if (window.confirm('The PoC will send the request to the target as soon as this tab loads.\nOpen it in a new tab?')) {
 								if (win) writePoc(win, d.poc); else openPoc();
 							} else {
 								if (win) win.close();
@@ -694,7 +697,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 						btn.disabled = false;
 						btn.innerHTML = label;
 						if (win) win.close();
-						showErrors(['Gagal generate: ' + ((err && err.message) || err)]);
+						showErrors(['Failed to generate: ' + ((err && err.message) || err)]);
 					});
 			});
 		}
